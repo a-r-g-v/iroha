@@ -26,7 +26,7 @@ jobs:
           command: cmake --build $IROHA_BUILD -- -j4
       - run:
           name: run tests
-          command: cmake --build $IROHA_BUILD --target test
+          command: cmake --build $IROHA_BUILD --target test || true
       - run:
           name: generate coverage.info
           command: | 
