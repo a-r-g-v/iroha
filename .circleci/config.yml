@@ -30,7 +30,7 @@ jobs:
       - run:
           name: generate coverage.info
           command: | 
-            sudo apt install lcov -y
+            apt install lcov -y
             lcov --capture --directory $IROHA_BUILD --output-file $IROHA_COVERAGE
       - run:
           name: report codecov
