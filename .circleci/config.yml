@@ -29,7 +29,9 @@ jobs:
           command: cmake --build $IROHA_BUILD --target test
       - run:
           name: generate coverage.info
-          command: lcov --capture --directory $IROHA_BUILD --output-file $IROHA_COVERAGE
+          command: | 
+            sudo apt install lcov -y
+            lcov --capture --directory $IROHA_BUILD --output-file $IROHA_COVERAGE
       - run:
           name: report codecov
           command: cd $IROHA_HOME && bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN -f $IROHA_COVERAGE
