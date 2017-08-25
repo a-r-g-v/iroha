@@ -33,9 +33,15 @@ jobs:
             apt update -y
             apt install lcov -y
             lcov --capture --directory $IROHA_BUILD --output-file $IROHA_COVERAGE
+            # rewrite using for each
+            lcov --extract $IROHA_COVERAGE "$IROHA_HOME/iroha-cli/*" > ${IROHA_COVERAGE}_iroha_cli
+            lcov --extract $IROHA_COVERAGE "$IROHA_HOME/irohad/*" > ${IROHA_COVERAGE}_irohad
+            lcov --extract $IROHA_COVERAGE "$IROHA_HOME/libs/*" > ${IROHA_COVERAGE}_libs
+            lcov -a ${IROHA_COVERAGE}_iroha_cli -a ${IROHA_COVERAGE}_irohad -a ${IROHA_COVERAGE}_libs > $IROHA_COVERAGE
+
       - run:
           name: report codecov
-          command: cd $IROHA_HOME && bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN -f $IROHA_COVERAGE
+          command: cd $IROHA_HOME && bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN -f $IROHA_COVERAGE -X gcov
 #
 #      - run:
 #          name: analyze source code with cppcheck and sonarqube
