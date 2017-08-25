@@ -27,6 +27,7 @@ jobs:
       - run:
           name: run tests
           command: cmake --build $IROHA_BUILD --target test || true
+
       - run:
           name: generate coverage.info
           command: | 
@@ -35,16 +36,24 @@ jobs:
             apt install lcov -y
             lcov --capture --directory $IROHA_BUILD --output-file $IROHA_COVERAGE
 
-            IROHA_COVERAGE_TARGET_DIRECOTIRES=('irohad' 'iroha-cli' 'libs')
-            for directory in ${IROHA_COVERAGE_TARGET_DIRECOTIRES[@]}; do
+            IROHA_COVERAGE_TARGET_DIRECTORIES=('irohad' 'iroha-cli' 'libs')
+            for directory in ${IROHA_COVERAGE_TARGET_DIRECTORIES[@]}; do
               lcov --extract $IROHA_COVERAGE "$IROHA_HOME/$directory/*" > ${IROHA_COVERAGE}_$directory
-              lcov -a ${IROHA_COVERAGE}_$directory -a ${IROHA_COVERAGE}_exulude_direcotires
             done
-            mv ${IROHA_COVERAGE}_exulude_direcotires $IROHA_COVERAGE
 
+            BASE_COVERAGE_REPORT=$IROHA_COVERAGE_TARGET_DIRECTORIES[0]
+            IROHA_COVERAGE_TARGET_DIRECTORIES=(${IROHA_COVERAGE_TARGET_DIRECTORIES[@]:1})
+            for directory in ${IROHA_COVERAGE_TARGET_DIRECTORIES[@]}; do
+              lcov -a ${IROHA_COVERAGE}_$directory -a ${IROHA_COVERAGE}_$BASE_COVERAGE_REPORT > $IROHA_COVERAGE
+              mv $IROHA_COVERAGE ${IROHA_COVERAGE}_$BASE_COVERAGE_REPORT
+            done
+
+            mv ${IROHA_COVERAGE}_$BASE_COVERAGE_REPORT $IROHA_COVERAGE
       - run:
           name: report codecov
-          command: cd $IROHA_HOME && bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN -f $IROHA_COVERAGE -X gcov
+          command: |
+            
+            cd $IROHA_HOME && bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN -f $IROHA_COVERAGE -X gcov
 #
 #      - run:
 #          name: analyze source code with cppcheck and sonarqube
