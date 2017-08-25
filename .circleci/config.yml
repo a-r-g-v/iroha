@@ -9,6 +9,7 @@ jobs:
           IROHA_HOME: /opt/iroha
           IROHA_BUILD: /tmp/build
           IROHA_COVERAGE: /tmp/build/coverage.info
+          IROHA_COVERAGE_TARGET_DIRECOTIRES: ('irohad' 'iroha-cli' 'libs')
       - image: postgres:9.5
       - image: redis:3.2.8
     steps:
@@ -35,7 +36,7 @@ jobs:
             apt install lcov -y
             lcov --capture --directory $IROHA_BUILD --output-file $IROHA_COVERAGE
 
-            for directory in ("iroha-cli" "irohad" "libs"); do
+            for directory in ${IROHA_COVERAGE_TARGET_DIRECOTIRES[@]}; do
               lcov --extract $IROHA_COVERAGE "$IROHA_HOME/$directory/*" > ${IROHA_COVERAGE}_$directory
               lcov -a ${IROHA_COVERAGE}_$directory -a ${IROHA_COVERAGE}_exulude_direcotires
             done
